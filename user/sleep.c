@@ -3,8 +3,8 @@
 #include "user/user.h"
 
 int main(){
-  if(argc < 2){
-     fprintf(2, “Usage: sleep for a new sec…\n”);
+  if(argc!){
+     fprintf(2, “no arg\n”);
      exit(-1);
   }
   sleep(atoi(argv[1]));

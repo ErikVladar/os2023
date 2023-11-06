@@ -67,6 +67,14 @@ usertrap(void)
     syscall();
   } else if((which_dev = devintr()) != 0){
     // ok
+  } else if(r_scause() == 15){ 
+     // ** Get virtual address causing page fault and corresponding pa & pte
+    uint64 addr = r_stval();
+    // ** If virtual address is over maximum va size or within guard page, kill the process
+    if (addr >= MAXVA || (addr < p->trapframe->sp && addr >= (p->trapframe->sp - PGSIZE)))
+      p->killed = 1;
+    if (cowalloc(p->pagetable, PGROUNDDOWN(addr)) < 0)
+      p->killed = 1;
   } else {
     printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
     printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
